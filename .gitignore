@@ -1,4 +1,75 @@
+# Planning docs
 rentify.md
 rentifyv2.md
-.venv/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
 __pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.so
+.Python
+.venv/
+venv/
+env/
+backend/.venv/
+scrapers/.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+pip-wheel-metadata/
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Frontend / Node / Vite
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+coverage/
+frontend/.vite/
+.vite/
+.pnpm-store/
+*.tsbuildinfo
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Scraper runtime output
+scrapers/output/*
+!scrapers/output/.gitkeep
+
+# Terraform local state
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Logs
+*.log
+logs/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
