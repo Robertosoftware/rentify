@@ -87,16 +87,19 @@ async def handle_webhook_event(body: bytes, signature: str, db: AsyncSession) ->
         event_type = event["type"]
         data = event
 
-    # Idempotency check
-    r = await _get_redis()
-    key = f"{_PROCESSED_EVENTS_PREFIX}{event_id}"
-    already_processed = await r.get(key)
-    if already_processed:
-        log.info("stripe.webhook_duplicate", event_id=event_id)
+    # Idempotency check (gracefully degrade if Redis unavailable)
+    try:
+        r = await _get_redis()
+        key = f"{_PROCESSED_EVENTS_PREFIX}{event_id}"
+        already_processed = await r.get(key)
+        if already_processed:
+            log.info("stripe.webhook_duplicate", event_id=event_id)
+            await r.aclose()
+            return
+        await r.set(key, "1", ex=86400)
         await r.aclose()
-        return
-    await r.set(key, "1", ex=86400)
-    await r.aclose()
+    except Exception as e:
+        log.warning("stripe.webhook_redis_unavailable", error=str(e))
 
     log.info("stripe.webhook", event_type=event_type, event_id=event_id)
 

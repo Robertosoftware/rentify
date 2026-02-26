@@ -8,8 +8,9 @@ MATCH_THRESHOLD = 0.5
 def score_listing(listing: Listing, pref: Preference) -> float:
     score = 0.0
 
-    if listing.city.lower() == pref.city.lower():
-        score += WEIGHTS["city"]
+    if listing.city.lower() != pref.city.lower():
+        return 0.0
+    score += WEIGHTS["city"]
 
     if pref.min_price is None or listing.price_eur >= pref.min_price:
         if listing.price_eur <= pref.max_price:

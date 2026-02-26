@@ -70,4 +70,4 @@ async def test_me_authenticated(async_client, test_user, auth_headers):
 @pytest.mark.anyio
 async def test_me_unauthenticated(async_client):
     response = await async_client.get("/auth/me")
-    assert response.status_code == 403  # no credentials = 403 from HTTPBearer
+    assert response.status_code == 401  # no credentials → 401 from HTTPBearer

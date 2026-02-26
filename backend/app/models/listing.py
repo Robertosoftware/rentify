@@ -2,7 +2,7 @@ import uuid
 from datetime import date, datetime, timezone
 from typing import Optional
 
-from sqlalchemy import ARRAY, JSON, String, UniqueConstraint
+from sqlalchemy import JSON, String, UniqueConstraint
 from sqlmodel import Column, DateTime, Field, SQLModel
 
 
@@ -38,7 +38,7 @@ class Listing(SQLModel, table=True):
     energy_label: Optional[str] = Field(default=None, sa_column=Column(String(5), nullable=True))
     available_from: Optional[date] = Field(default=None, nullable=True)
     rental_agent: Optional[str] = Field(default=None, sa_column=Column(String(255), nullable=True))
-    image_urls: Optional[list] = Field(default=None, sa_column=Column(ARRAY(String), nullable=True))
+    image_urls: Optional[list] = Field(default=None, sa_column=Column(JSON, nullable=True))
     raw_data: Optional[dict] = Field(default=None, sa_column=Column(JSON, nullable=True))
     first_seen_at: datetime = Field(default_factory=utcnow, sa_column=Column(DateTime(timezone=True), nullable=False))
     last_seen_at: datetime = Field(default_factory=utcnow, sa_column=Column(DateTime(timezone=True), nullable=False))

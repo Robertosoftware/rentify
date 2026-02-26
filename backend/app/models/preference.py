@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import ARRAY, String
+from sqlalchemy import JSON, String
 from sqlmodel import Column, DateTime, Field, SQLModel
 
 
@@ -25,7 +25,7 @@ class Preference(SQLModel, table=True):
     max_size_sqm: Optional[int] = Field(default=None, nullable=True)
     pet_friendly: bool = Field(default=False)
     furnished: Optional[bool] = Field(default=None, nullable=True)
-    keywords: Optional[list] = Field(default=None, sa_column=Column(ARRAY(String), nullable=True))
+    keywords: Optional[list] = Field(default=None, sa_column=Column(JSON, nullable=True))
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=utcnow, sa_column=Column(DateTime(timezone=True), nullable=False))
     updated_at: datetime = Field(default_factory=utcnow, sa_column=Column(DateTime(timezone=True), nullable=False))
