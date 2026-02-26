@@ -1,2 +1,4 @@
 rentify.md
 rentifyv2.md
+.venv/
+__pycache__/

@@ -35,12 +35,18 @@ async def startup_event() -> None:
 
 
 # --- Routers ---
-from app.api import auth, billing, preferences, notifications, admin, gdpr, oauth  # noqa: E402
+from app.api import auth, billing, preferences, notifications, admin, gdpr, oauth, listings  # noqa: E402
+from app.middleware.logging_mw import LoggingMiddleware  # noqa: E402
+from app.middleware.rate_limit import RateLimitMiddleware  # noqa: E402
+
+app.add_middleware(LoggingMiddleware)
+app.add_middleware(RateLimitMiddleware)
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(oauth.router, prefix="/auth", tags=["auth"])
 app.include_router(billing.router, tags=["billing"])
 app.include_router(preferences.router, tags=["preferences"])
+app.include_router(listings.router, tags=["listings"])
 app.include_router(notifications.router, tags=["notifications"])
 app.include_router(admin.router, tags=["admin"])
 app.include_router(gdpr.router, tags=["gdpr"])
@@ -71,3 +77,11 @@ async def health() -> dict:
         redis_status = "error"
 
     return {"status": "ok", "db": db_status, "redis": redis_status}
+
+
+@app.get("/metrics", tags=["observability"])
+async def metrics():
+    from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+    from starlette.responses import Response
+
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
