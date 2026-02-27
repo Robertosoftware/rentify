@@ -2,18 +2,19 @@
   <div class="auth-page">
     <div class="auth-card">
       <RouterLink to="/" class="brand">Rentify</RouterLink>
-      <h2>Sign in to your account</h2>
+      <h2>Welcome back</h2>
+      <p class="subtitle">Sign in to your account</p>
 
       <ErrorAlert v-if="error" :message="error" />
 
       <form @submit.prevent="handleSubmit" class="form">
         <div class="field">
-          <label>Email</label>
+          <label>Email *</label>
           <input v-model="form.email" type="email" placeholder="you@example.com" required />
         </div>
         <div class="field">
-          <label>Password</label>
-          <input v-model="form.password" type="password" placeholder="••••••••" required />
+          <label>Password *</label>
+          <input v-model="form.password" type="password" placeholder="Your password" required />
         </div>
         <button type="submit" class="btn-submit" :disabled="authStore.loading">
           <LoadingSpinner v-if="authStore.loading" size="sm" />
@@ -48,7 +49,7 @@ async function handleSubmit() {
     await authStore.login(form.value.email, form.value.password)
     router.push('/dashboard')
   } catch (e: any) {
-    error.value = e.response?.data?.detail || 'Invalid email or password.'
+    error.value = e.response?.data?.detail || 'Login failed. Please try again.'
   }
 }
 </script>
@@ -57,7 +58,8 @@ async function handleSubmit() {
 .auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f8f9fa; padding: 2rem; }
 .auth-card { background: white; border-radius: 1rem; padding: 2.5rem; width: 100%; max-width: 440px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
 .brand { display: block; font-size: 1.5rem; font-weight: 700; color: #4f46e5; margin-bottom: 1.5rem; text-decoration: none; }
-.auth-card h2 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+.auth-card h2 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+.subtitle { color: #6b7280; margin-bottom: 1.5rem; }
 .form { display: flex; flex-direction: column; gap: 1rem; }
 .field { display: flex; flex-direction: column; gap: 0.25rem; }
 .field label { font-size: 0.875rem; font-weight: 500; }

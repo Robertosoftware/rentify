@@ -1,0 +1,23 @@
+# Overlay on top of docker-compose.dev.yml — adds the workspace service
+# used as the devcontainer target.
+
+services:
+  workspace:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sleep infinity
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:password@postgres:5432/rentify
+      DATABASE_URL_SYNC: postgresql://postgres:password@postgres:5432/rentify
+      REDIS_URL: redis://redis:6379/0
+      VITE_API_URL: http://localhost:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    user: dev
