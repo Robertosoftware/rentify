@@ -23,7 +23,7 @@ uv run alembic upgrade head || echo "  (migrations skipped — run manually once
 # Frontend deps
 echo "==> Installing frontend npm dependencies..."
 cd /workspace/frontend
-npm ci
+npm install
 
 # Scrapers deps
 echo "==> Installing scraper dependencies with uv..."

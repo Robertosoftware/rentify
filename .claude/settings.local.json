@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/bin/pip install:*)",
+      "Bash(.venv/bin/python:*)",
+      "Bash(/Users/rbonilla/Documents/Mac/Personal/Repos/Netify/rentify-nl/scrapers/tests/fixtures/housinganywhere_search_results.html:*)",
+      "Bash(PYTHONPATH=/Users/rbonilla/Documents/Mac/Personal/Repos/Netify/rentify-nl .venv/bin/python:*)",
+      "Bash(npm install:*)",
+      "Bash(cd /workspace/frontend && npm audit 2>&1)",
+      "Bash(npm info @vitejs/plugin-vue peerDependencies 2>&1 && npm ls vite @vitejs/plugin-vue --depth=0 2>&1)",
+      "Bash(npm audit 2>&1)",
+      "Bash(cd /workspace/scrapers && uv sync 2>&1)"
+    ]
+  }
+}

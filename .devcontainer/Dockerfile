@@ -12,9 +12,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install uv via official installer
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-# Install pre-commit (uses uv tool install for isolation)
-RUN uv tool install pre-commit
-
 # Install Claude Code globally
 RUN npm install -g @anthropic-ai/claude-code
 
@@ -26,4 +23,7 @@ WORKDIR /workspace
 USER dev
 
 # Make uv tools available on PATH for dev user
-ENV PATH="/root/.local/bin:/home/dev/.local/bin:$PATH"
+ENV PATH="/home/dev/.local/bin:$PATH"
+
+# Install pre-commit as the dev user so it lands in /home/dev/.local/bin
+RUN uv tool install pre-commit
