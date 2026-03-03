@@ -56,14 +56,14 @@
 - [x] **`scrapers/pyproject.toml`** — added `pythonpath = [".."]` so all scraper tests resolve imports correctly
 
 ### Medium priority
-- [ ] **`frontend/tsconfig.app.json` + `tsconfig.node.json`** — spec requires split tsconfig; only `tsconfig.json` exists
-- [ ] **`frontend/env.d.ts`** — Vue SFC TypeScript shim (`/// <reference types="vite/client" />`)
-- [ ] **FastAPI `on_event` deprecation** — `app/main.py` uses `@app.on_event("startup"/"shutdown")`; should migrate to `lifespan=` context manager (21 deprecation warnings in test output)
-- [ ] **Redis `aclose()` vs `close()`** — `main.py:75` changed to `close()` to satisfy mypy stubs, but redis 5.x deprecates `close()` in favour of `aclose()`; fix by adding `# type: ignore[attr-defined]` and reverting to `aclose()`
+- [x] **`frontend/tsconfig.app.json` + `tsconfig.node.json`** — split tsconfig with project references; root `tsconfig.json` updated to reference both
+- [x] **`frontend/env.d.ts`** — added `/// <reference types="vite/client" />`; also cleaned up `import.meta as any` cast and `require()` → async `import()` in `useApi.ts`
+- [x] **FastAPI `on_event` → `lifespan`** — migrated to `@asynccontextmanager` lifespan handler
+- [x] **Redis `aclose()`** — reverted to `aclose()` with `# type: ignore[attr-defined]` (mypy stubs lag behind redis 5.x API)
 
 ### Low priority
 - [ ] **`frontend` uses npm** (`package-lock.json`) — spec says pnpm (`pnpm-lock.yaml`); functional but inconsistent with spec
-- [ ] **`frontend/eslint.config.ts`** — spec calls for flat ESLint 9 config in TypeScript; current setup uses JS-based config
+- [x] **`.eslintrc.cjs`** — already present with `vue3-recommended` + `@typescript-eslint` + prettier; `.prettierrc` already present, added `tabWidth: 2`
 - [ ] **Fixture HTML files for listing detail pages** — `kamernet_listing_page.html` and `huurwoningen_listing_page.html` missing (funda + pararius have them)
 - [ ] **`infra/terraform/main.tf`** and **`infra/k8s/README.md`** — spec says skeleton only; may be empty/absent
 

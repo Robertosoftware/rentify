@@ -2,7 +2,7 @@
   <Transition name="slide-up">
     <div v-if="!consented" class="cookie-banner">
       <p>We use only necessary cookies for authentication. No tracking. <RouterLink to="/privacy">Privacy Policy</RouterLink></p>
-      <button @click="accept" class="btn-accept">Accept</button>
+      <button class="btn-accept" @click="accept">Accept</button>
     </div>
   </Transition>
 </template>

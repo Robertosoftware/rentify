@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance } from 'axios'
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
@@ -8,10 +8,9 @@ const api: AxiosInstance = axios.create({
 })
 
 // Lazy import to avoid circular deps at module load time
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { useAuthStore } = require('../stores/auth')
+    const { useAuthStore } = await import('../stores/auth')
     const authStore = useAuthStore()
     if (authStore.token) {
       config.headers.Authorization = `Bearer ${authStore.token}`

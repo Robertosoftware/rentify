@@ -7,7 +7,7 @@
 
       <ErrorAlert v-if="error" :message="error" />
 
-      <form @submit.prevent="handleSubmit" class="form">
+      <form class="form" @submit.prevent="handleSubmit">
         <div class="field">
           <label>Full name</label>
           <input v-model="form.fullName" type="text" placeholder="Jane Doe" />

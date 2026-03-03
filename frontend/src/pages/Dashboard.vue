@@ -5,7 +5,7 @@
       <nav class="nav-links">
         <RouterLink to="/dashboard">Dashboard</RouterLink>
         <RouterLink to="/preferences">Preferences</RouterLink>
-        <button @click="handleLogout" class="btn-logout">Logout</button>
+        <button class="btn-logout" @click="handleLogout">Logout</button>
       </nav>
     </header>
 

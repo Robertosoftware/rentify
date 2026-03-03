@@ -7,7 +7,7 @@
 
       <ErrorAlert v-if="error" :message="error" />
 
-      <form @submit.prevent="handleSubmit" class="form">
+      <form class="form" @submit.prevent="handleSubmit">
         <div class="field">
           <label>Email *</label>
           <input v-model="form.email" type="email" placeholder="you@example.com" required />

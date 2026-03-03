@@ -5,7 +5,7 @@
       <nav class="nav-links">
         <RouterLink to="/dashboard">Dashboard</RouterLink>
         <RouterLink to="/preferences">Preferences</RouterLink>
-        <button @click="handleLogout" class="btn-logout">Logout</button>
+        <button class="btn-logout" @click="handleLogout">Logout</button>
       </nav>
     </header>
 
@@ -19,7 +19,7 @@
 
       <div v-if="showForm" class="form-card">
         <h2>{{ editingId ? 'Edit Preference' : 'New Preference' }}</h2>
-        <form @submit.prevent="handleSave" class="form">
+        <form class="form" @submit.prevent="handleSave">
           <div class="field-row">
             <div class="field">
               <label>City *</label>
@@ -75,7 +75,7 @@
             </label>
           </div>
           <div class="form-actions">
-            <button type="button" @click="cancelForm" class="btn-cancel">Cancel</button>
+            <button type="button" class="btn-cancel" @click="cancelForm">Cancel</button>
             <button type="submit" class="btn-save" :disabled="saving">
               <LoadingSpinner v-if="saving" size="sm" />
               <span v-else>{{ editingId ? 'Save Changes' : 'Create Preference' }}</span>
@@ -91,7 +91,7 @@
       <div v-else>
         <div class="list-header">
           <h2>Your Preferences</h2>
-          <button v-if="!showForm" @click="openNewForm" class="btn-add">+ Add Preference</button>
+          <button v-if="!showForm" class="btn-add" @click="openNewForm">+ Add Preference</button>
         </div>
 
         <div v-if="userStore.preferences.length === 0 && !showForm" class="empty-state">
@@ -108,8 +108,8 @@
               <span v-if="pref.furnished" class="tag">Furnished</span>
             </div>
             <div class="pref-card__actions">
-              <button @click="openEditForm(pref)" class="btn-edit">Edit</button>
-              <button @click="handleDelete(pref.id)" class="btn-delete">Delete</button>
+              <button class="btn-edit" @click="openEditForm(pref)">Edit</button>
+              <button class="btn-delete" @click="handleDelete(pref.id)">Delete</button>
             </div>
           </div>
         </div>
