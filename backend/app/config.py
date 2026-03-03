@@ -23,7 +23,7 @@ class Settings:
     GOOGLE_REDIRECT_URI: str = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/google/callback")
 
     # Stripe
-    STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY", "sk_test_placeholder")
+    STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY", "")
     STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "whsec_placeholder")
     STRIPE_PRICE_ID: str = os.getenv("STRIPE_PRICE_ID", "price_placeholder")
     MOCK_STRIPE: bool = os.getenv("MOCK_STRIPE", "true").lower() == "true"

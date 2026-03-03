@@ -1,13 +1,13 @@
 import uuid
 from datetime import UTC, datetime, timedelta
 
+import jwt
 import structlog
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import col, select
 
 from app.config import get_settings
 from app.db.session import get_db
@@ -48,13 +48,13 @@ async def get_current_user(
     try:
         token = credentials.credentials
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
-        user_id: str = payload.get("sub")
+        user_id: str | None = payload.get("sub")
         if not user_id or payload.get("type") != "access":
             raise HTTPException(status_code=401, detail="Invalid token")
-    except JWTError as e:
+    except jwt.PyJWTError as e:
         raise HTTPException(status_code=401, detail="Invalid or expired token") from e
 
-    result = await db.execute(select(User).where(User.id == uuid.UUID(user_id), User.deleted_at.is_(None)))
+    result = await db.execute(select(User).where(User.id == uuid.UUID(user_id), col(User.deleted_at).is_(None)))
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")

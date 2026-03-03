@@ -15,7 +15,7 @@ def match_listing(listing_id: str) -> None:
 
 
 async def _match_listing_async(listing_id: str) -> None:
-    from sqlmodel import select
+    from sqlmodel import col, select
 
     from app.db.session import AsyncSessionLocal
     from app.models.listing import Listing
@@ -32,7 +32,7 @@ async def _match_listing_async(listing_id: str) -> None:
         result = await db.execute(
             select(Preference).where(
                 Preference.city == listing.city,
-                Preference.is_active.is_(True),
+                col(Preference.is_active).is_(True),
             )
         )
         prefs = result.scalars().all()

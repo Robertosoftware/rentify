@@ -5,7 +5,7 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import col, select
 
 from app.db.session import get_db
 from app.models.preference import Preference
@@ -50,7 +50,7 @@ class PreferenceUpdate(BaseModel):
 @router.get("/preferences")
 async def list_preferences(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)) -> dict:
     result = await db.execute(
-        select(Preference).where(Preference.user_id == current_user.id, Preference.is_active.is_(True))
+        select(Preference).where(Preference.user_id == current_user.id, col(Preference.is_active).is_(True))
     )
     prefs = result.scalars().all()
     return {"items": [_pref_to_dict(p) for p in prefs], "total": len(prefs)}
@@ -61,7 +61,7 @@ async def create_preference(
     body: PreferenceCreate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ) -> dict:
     result = await db.execute(
-        select(Preference).where(Preference.user_id == current_user.id, Preference.is_active.is_(True))
+        select(Preference).where(Preference.user_id == current_user.id, col(Preference.is_active).is_(True))
     )
     existing = result.scalars().all()
 

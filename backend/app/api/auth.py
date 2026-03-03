@@ -1,13 +1,13 @@
 import uuid
 from datetime import UTC, datetime
 
+import jwt
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPBearer
-from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import col, select
 
 from app.config import get_settings
 from app.db.session import get_db
@@ -58,7 +58,7 @@ async def register(body: RegisterRequest, response: Response, db: AsyncSession =
     if len(body.password) < 8:
         raise HTTPException(status_code=422, detail="Password must be at least 8 characters")
 
-    result = await db.execute(select(User).where(User.email == body.email, User.deleted_at.is_(None)))
+    result = await db.execute(select(User).where(User.email == body.email, col(User.deleted_at).is_(None)))
     existing = result.scalar_one_or_none()
     if existing:
         raise HTTPException(status_code=409, detail="Email already registered")
@@ -92,7 +92,7 @@ async def register(body: RegisterRequest, response: Response, db: AsyncSession =
 
 @router.post("/login", response_model=TokenResponse)
 async def login(body: LoginRequest, response: Response, db: AsyncSession = Depends(get_db)) -> TokenResponse:
-    result = await db.execute(select(User).where(User.email == body.email, User.deleted_at.is_(None)))
+    result = await db.execute(select(User).where(User.email == body.email, col(User.deleted_at).is_(None)))
     user = result.scalar_one_or_none()
 
     if not user or not user.hashed_password or not verify_password(body.password, user.hashed_password):
@@ -122,10 +122,10 @@ async def refresh_token(request: Request) -> TokenResponse:
 
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
-        user_id: str = payload.get("sub")
+        user_id: str | None = payload.get("sub")
         if not user_id or payload.get("type") != "refresh":
             raise HTTPException(status_code=401, detail="Invalid refresh token")
-    except JWTError as e:
+    except jwt.PyJWTError as e:
         raise HTTPException(status_code=401, detail="Invalid refresh token") from e
 
     access_token = create_access_token(user_id)

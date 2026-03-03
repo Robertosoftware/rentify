@@ -4,7 +4,7 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import func, select
+from sqlmodel import col, func, select
 
 from app.db.session import get_db
 from app.models.feature_flag import FeatureFlag
@@ -59,9 +59,9 @@ async def list_users(
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     offset = (page - 1) * per_page
-    count_result = await db.execute(select(func.count(User.id)).where(User.deleted_at.is_(None)))
+    count_result = await db.execute(select(func.count()).where(col(User.deleted_at).is_(None)))
     total = count_result.scalar_one()
-    result = await db.execute(select(User).where(User.deleted_at.is_(None)).offset(offset).limit(per_page))
+    result = await db.execute(select(User).where(col(User.deleted_at).is_(None)).offset(offset).limit(per_page))
     users = result.scalars().all()
     pages = (total + per_page - 1) // per_page
     return {

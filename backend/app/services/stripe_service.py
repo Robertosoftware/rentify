@@ -59,6 +59,8 @@ async def create_portal_session(user: User, db: AsyncSession) -> dict:
     import stripe
 
     stripe.api_key = settings.STRIPE_SECRET_KEY
+    if not user.stripe_customer_id:
+        raise ValueError("User has no Stripe customer ID")
     session = stripe.billing_portal.Session.create(
         customer=user.stripe_customer_id,
         return_url="http://localhost:5173/dashboard",
@@ -187,4 +189,4 @@ async def cancel_subscription(stripe_customer_id: str) -> None:
     stripe.api_key = settings.STRIPE_SECRET_KEY
     subscriptions = stripe.Subscription.list(customer=stripe_customer_id, status="active")
     for sub in subscriptions.data:
-        stripe.Subscription.delete(sub.id)
+        sub.delete()

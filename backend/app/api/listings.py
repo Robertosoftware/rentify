@@ -3,7 +3,7 @@ import uuid
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import func, select
+from sqlmodel import col, func, select
 
 from app.db.session import get_db
 from app.middleware.paid_gate import paid_gate
@@ -25,9 +25,9 @@ async def list_listings(
     current_user: User = Depends(paid_gate),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    query = select(Listing).where(Listing.delisted_at.is_(None))
+    query = select(Listing).where(col(Listing.delisted_at).is_(None))
     if city:
-        query = query.where(Listing.city.ilike(f"%{city}%"))
+        query = query.where(col(Listing.city).ilike(f"%{city}%"))
     if min_price is not None:
         query = query.where(Listing.price_eur >= min_price)
     if max_price is not None:
@@ -72,8 +72,8 @@ async def list_matches(
 ) -> dict:
     query = select(Match).where(Match.user_id == current_user.id)
     if unread_only:
-        query = query.where(Match.notified.is_(False))
-    query = query.order_by(Match.created_at.desc())
+        query = query.where(col(Match.notified).is_(False))
+    query = query.order_by(col(Match.created_at).desc())
 
     count_result = await db.execute(select(func.count()).select_from(query.subquery()))
     total = count_result.scalar_one()

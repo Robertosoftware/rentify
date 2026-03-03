@@ -5,7 +5,7 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import col, select
 
 from app.config import get_settings
 from app.db.session import get_db
@@ -71,11 +71,11 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)) -> Redi
     email = google_user.get("email")
     full_name = google_user.get("name")
 
-    result = await db.execute(select(User).where(User.google_id == google_id, User.deleted_at.is_(None)))
+    result = await db.execute(select(User).where(User.google_id == google_id, col(User.deleted_at).is_(None)))
     user = result.scalar_one_or_none()
 
     if not user:
-        result = await db.execute(select(User).where(User.email == email, User.deleted_at.is_(None)))
+        result = await db.execute(select(User).where(User.email == email, col(User.deleted_at).is_(None)))
         user = result.scalar_one_or_none()
 
     if not user:
