@@ -1,0 +1,4 @@
+# CVE-2026-0861: glibc integer overflow in memalign (libc-bin, libc6)
+# Status: affected, no fixed version available for Debian 13.3 as of 2026-03-03
+# Revisit when Debian releases a patch: https://avd.aquasec.com/nvd/cve-2026-0861
+CVE-2026-0861
