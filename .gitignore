@@ -46,6 +46,7 @@ frontend/.vite/
 .pnpm-store/
 *.tsbuildinfo
 .eslintcache
+.claude
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,16 +7,26 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 
 settings = get_settings()
-
 log = structlog.get_logger()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    log.info("rentify.startup", env="development")
+    if settings.SENTRY_DSN:
+        import sentry_sdk
+
+        sentry_sdk.init(dsn=settings.SENTRY_DSN, traces_sample_rate=0.1)
+    yield
+
 
 app = FastAPI(
     title="Rentify API",
     description="Rental listing aggregator API",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:3000"],
@@ -22,17 +34,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-async def startup_event() -> None:
-    log.info("rentify.startup", env="development")
-
-    if settings.SENTRY_DSN:
-        import sentry_sdk
-
-        sentry_sdk.init(dsn=settings.SENTRY_DSN, traces_sample_rate=0.1)
-
 
 # --- Routers ---
 from app.api import admin, auth, billing, gdpr, listings, notifications, oauth, preferences  # noqa: E402
@@ -72,7 +73,7 @@ async def health() -> dict:
 
         r = aioredis.from_url(settings.REDIS_URL)
         await r.ping()
-        await r.close()
+        await r.aclose()  # type: ignore[attr-defined]
     except Exception:
         redis_status = "error"
 

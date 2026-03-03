@@ -49,10 +49,11 @@
 ## ❌ Missing / Incomplete
 
 ### High priority
-- [ ] **`frontend/Dockerfile`** — not present; needed for `docker-compose.dev.yml` `frontend` service
-- [ ] **`scrapers/Dockerfile`** — not present; needed for `docker-compose.dev.yml` `worker` service
-- [ ] **`scrapers/tests/test_housinganywhere_parser.py`** — scraper exists, no test
-- [ ] **`scrapers/tests/test_direct_bij_eigenaar_parser.py`** — scraper exists, no test
+- [x] **`frontend/Dockerfile`**
+- [x] **`scrapers/Dockerfile`**
+- [x] **`scrapers/tests/test_housinganywhere_parser.py`** — 4 tests, all passing
+- [x] **`scrapers/tests/test_direct_bij_eigenaar_parser.py`** — 5 tests, all passing
+- [x] **`scrapers/pyproject.toml`** — added `pythonpath = [".."]` so all scraper tests resolve imports correctly
 
 ### Medium priority
 - [ ] **`frontend/tsconfig.app.json` + `tsconfig.node.json`** — spec requires split tsconfig; only `tsconfig.json` exists
