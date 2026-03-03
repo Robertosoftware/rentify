@@ -41,6 +41,7 @@ dev = [
     "anyio==4.3.0",
     "aiosqlite==0.20.0",
     "testcontainers==4.4.1",
+    "ruff>=0.15.4",
 ]
 
 [tool.ruff]
@@ -49,12 +50,13 @@ line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM"]
-ignore = ["A002", "A003", "N818"]
+ignore = ["A002", "A003", "N818", "B008"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = false
 ignore_missing_imports = true
+explicit_package_bases = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

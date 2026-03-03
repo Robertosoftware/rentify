@@ -34,28 +34,36 @@ class FundaScraper(BaseScraper):
                 if not link:
                     continue
                 href = link.get("href", "")
-                source_url = href if href.startswith("http") else f"{self.base_url}{href}"
+                source_url = (
+                    href if href.startswith("http") else f"{self.base_url}{href}"
+                )
                 source_id = href.rstrip("/").split("/")[-1] if "/" in href else href
-                title_el = card.find(["h2", "h3"]) or card.find(class_=re.compile(r"title"))
+                title_el = card.find(["h2", "h3"]) or card.find(
+                    class_=re.compile(r"title")
+                )
                 title = title_el.get_text(strip=True) if title_el else "Funda listing"
                 price_el = card.find(class_=re.compile(r"price"))
                 price_text = price_el.get_text(strip=True) if price_el else ""
                 price_cents = _parse_price(price_text)
-                results.append(RawListingPreview(
-                    source_site="funda",
-                    source_id=source_id,
-                    source_url=source_url,
-                    title=title,
-                    price_eur_cents=price_cents,
-                    city="amsterdam",
-                ))
+                results.append(
+                    RawListingPreview(
+                        source_site="funda",
+                        source_id=source_id,
+                        source_url=source_url,
+                        title=title,
+                        price_eur_cents=price_cents,
+                        city="amsterdam",
+                    )
+                )
             except Exception:
                 continue
         return results
 
     async def parse_listing_detail(self, html: str) -> Optional[NormalizedListing]:
         soup = BeautifulSoup(html, "lxml")
-        title_el = soup.find(["h1"]) or soup.find(class_=re.compile(r"object-header__title"))
+        title_el = soup.find(["h1"]) or soup.find(
+            class_=re.compile(r"object-header__title")
+        )
         title = title_el.get_text(strip=True) if title_el else "Funda listing"
         price_el = soup.find(class_=re.compile(r"price"))
         price_text = price_el.get_text(strip=True) if price_el else "€ 1.000 /maand"

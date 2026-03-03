@@ -1,7 +1,8 @@
 """Create a demo user for development."""
+
 import asyncio
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel, select
@@ -32,9 +33,9 @@ async def create_demo_user():
             hashed_password=hash_password("demo1234"),
             full_name="Demo User",
             subscription_status="trialing",
-            gdpr_consent_at=datetime.now(timezone.utc),
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
+            gdpr_consent_at=datetime.now(UTC),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
         db.add(user)
         await db.commit()

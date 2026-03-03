@@ -29,22 +29,30 @@ class KamernetScraper(BaseScraper):
                 if not link:
                     continue
                 href = link.get("href", "")
-                source_url = href if href.startswith("http") else f"{self.base_url}{href}"
-                source_id = re.search(r"/(\d+)", href)
-                source_id = source_id.group(1) if source_id else href.split("/")[-1]
-                title_el = card.find(["h2", "h3"]) or card.find(class_=re.compile(r"title"))
-                title = title_el.get_text(strip=True) if title_el else "Kamernet listing"
+                source_url = (
+                    href if href.startswith("http") else f"{self.base_url}{href}"
+                )
+                id_match = re.search(r"/(\d+)", href)
+                source_id = id_match.group(1) if id_match else href.split("/")[-1]
+                title_el = card.find(["h2", "h3"]) or card.find(
+                    class_=re.compile(r"title")
+                )
+                title = (
+                    title_el.get_text(strip=True) if title_el else "Kamernet listing"
+                )
                 price_el = card.find(class_=re.compile(r"price|rent"))
                 price_text = price_el.get_text(strip=True) if price_el else ""
                 price_cents = _parse_price(price_text)
-                results.append(RawListingPreview(
-                    source_site="kamernet",
-                    source_id=source_id,
-                    source_url=source_url,
-                    title=title,
-                    price_eur_cents=price_cents,
-                    city="amsterdam",
-                ))
+                results.append(
+                    RawListingPreview(
+                        source_site="kamernet",
+                        source_id=source_id,
+                        source_url=source_url,
+                        title=title,
+                        price_eur_cents=price_cents,
+                        city="amsterdam",
+                    )
+                )
             except Exception:
                 continue
         return results

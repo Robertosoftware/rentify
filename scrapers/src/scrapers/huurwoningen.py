@@ -30,21 +30,31 @@ class HuurwoningenScraper(BaseScraper):
                 if not link:
                     continue
                 href = link.get("href", "")
-                source_url = href if href.startswith("http") else f"{self.base_url}{href}"
+                source_url = (
+                    href if href.startswith("http") else f"{self.base_url}{href}"
+                )
                 source_id = href.rstrip("/").split("/")[-1]
-                title_el = card.find(["h2", "h3"]) or card.find(class_=re.compile(r"title"))
-                title = title_el.get_text(strip=True) if title_el else "Huurwoningen listing"
+                title_el = card.find(["h2", "h3"]) or card.find(
+                    class_=re.compile(r"title")
+                )
+                title = (
+                    title_el.get_text(strip=True)
+                    if title_el
+                    else "Huurwoningen listing"
+                )
                 price_el = card.find(class_=re.compile(r"price|huurprijs"))
                 price_text = price_el.get_text(strip=True) if price_el else ""
                 price_cents = _parse_price(price_text)
-                results.append(RawListingPreview(
-                    source_site="huurwoningen",
-                    source_id=source_id,
-                    source_url=source_url,
-                    title=title,
-                    price_eur_cents=price_cents,
-                    city="amsterdam",
-                ))
+                results.append(
+                    RawListingPreview(
+                        source_site="huurwoningen",
+                        source_id=source_id,
+                        source_url=source_url,
+                        title=title,
+                        price_eur_cents=price_cents,
+                        city="amsterdam",
+                    )
+                )
             except Exception:
                 continue
         return results

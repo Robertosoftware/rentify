@@ -1,5 +1,4 @@
 """Scheduled reminder tasks — enqueued from Stripe webhook handler."""
-from datetime import timedelta
 
 import structlog
 

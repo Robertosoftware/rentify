@@ -1,3 +1,5 @@
+from datetime import UTC
+
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -34,7 +36,7 @@ async def list_flags(admin: User = Depends(require_admin), db: AsyncSession = De
 async def update_flag(
     name: str, body: FlagUpdate, admin: User = Depends(require_admin), db: AsyncSession = Depends(get_db)
 ) -> dict:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     result = await db.execute(select(FeatureFlag).where(FeatureFlag.name == name))
     flag = result.scalar_one_or_none()
@@ -42,7 +44,7 @@ async def update_flag(
         raise HTTPException(status_code=404, detail="Feature flag not found")
     flag.enabled = body.enabled
     flag.updated_by = admin.id
-    flag.updated_at = datetime.now(timezone.utc)
+    flag.updated_at = datetime.now(UTC)
     await db.commit()
     await db.refresh(flag)
     log.info("feature_flag.updated", name=name, enabled=body.enabled, updated_by=str(admin.id))

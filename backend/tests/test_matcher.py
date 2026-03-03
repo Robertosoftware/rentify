@@ -1,7 +1,5 @@
 import uuid
-from datetime import datetime, timezone
-
-import pytest
+from datetime import UTC, datetime
 
 from app.models.listing import Listing
 from app.models.preference import Preference
@@ -19,9 +17,9 @@ def make_listing(**kwargs):
         city="amsterdam",
         rooms=2.0,
         size_sqm=60,
-        first_seen_at=datetime.now(timezone.utc),
-        last_seen_at=datetime.now(timezone.utc),
-        created_at=datetime.now(timezone.utc),
+        first_seen_at=datetime.now(UTC),
+        last_seen_at=datetime.now(UTC),
+        created_at=datetime.now(UTC),
     )
     defaults.update(kwargs)
     return Listing(**defaults)
@@ -38,8 +36,8 @@ def make_pref(**kwargs):
         max_rooms=4.0,
         min_size_sqm=40,
         max_size_sqm=120,
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
     defaults.update(kwargs)
     return Preference(**defaults)
@@ -47,7 +45,15 @@ def make_pref(**kwargs):
 
 def test_exact_match_high_score():
     listing = make_listing(city="amsterdam", price_eur=150000, rooms=2.0, size_sqm=60)
-    pref = make_pref(city="amsterdam", max_price=200000, min_price=100000, min_rooms=1.0, max_rooms=3.0, min_size_sqm=40, max_size_sqm=100)
+    pref = make_pref(
+        city="amsterdam",
+        max_price=200000,
+        min_price=100000,
+        min_rooms=1.0,
+        max_rooms=3.0,
+        min_size_sqm=40,
+        max_size_sqm=100,
+    )
     score = score_listing(listing, pref)
     assert score >= 0.8
 

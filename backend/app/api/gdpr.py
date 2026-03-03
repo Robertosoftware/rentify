@@ -1,3 +1,5 @@
+from datetime import UTC
+
 import structlog
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,9 +45,9 @@ async def export_data(current_user: User = Depends(get_current_user), db: AsyncS
 
 @router.delete("/gdpr/delete-account", status_code=status.HTTP_202_ACCEPTED)
 async def delete_account(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)) -> dict:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     current_user.deleted_at = now
     current_user.email = f"deleted_{current_user.id}@deleted.invalid"
     current_user.full_name = None
@@ -54,8 +56,12 @@ async def delete_account(current_user: User = Depends(get_current_user), db: Asy
     current_user.google_id = None
     current_user.updated_at = now
 
-    if current_user.stripe_customer_id and not __import__("app.config", fromlist=["get_settings"]).get_settings().MOCK_STRIPE:
+    if (
+        current_user.stripe_customer_id
+        and not __import__("app.config", fromlist=["get_settings"]).get_settings().MOCK_STRIPE
+    ):
         from app.services.stripe_service import cancel_subscription
+
         await cancel_subscription(current_user.stripe_customer_id)
 
     await db.commit()

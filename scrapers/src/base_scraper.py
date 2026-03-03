@@ -3,7 +3,6 @@ import logging
 import random
 import urllib.robotparser
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
 from typing import Optional
 
 import aiohttp
@@ -46,7 +45,9 @@ class BaseScraper(ABC):
             rp.read()
             return rp.can_fetch("*", f"{self.base_url}{path}")
         except Exception as e:
-            log.warning("robots_check_failed", extra={"site": self.site_name, "error": str(e)})
+            log.warning(
+                "robots_check_failed", extra={"site": self.site_name, "error": str(e)}
+            )
             return True  # Default to allowing
 
     async def fetch_page(self, url: str, retries: int = 3) -> str:
@@ -56,9 +57,13 @@ class BaseScraper(ABC):
                 try:
                     await self.throttler.wait(self.site_name)
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                        async with session.get(
+                            url,
+                            headers=headers,
+                            timeout=aiohttp.ClientTimeout(total=30),
+                        ) as resp:
                             if resp.status == 429:
-                                wait = 30 * (2 ** attempt)
+                                wait = 30 * (2**attempt)
                                 log.warning(f"Rate limited on {url}, waiting {wait}s")
                                 await asyncio.sleep(wait)
                                 headers = self.agent_rotator.get_headers()
@@ -72,8 +77,10 @@ class BaseScraper(ABC):
                 except aiohttp.ClientError as e:
                     if attempt == retries - 1:
                         raise
-                    delay = 2 ** attempt
-                    log.warning(f"Request failed (attempt {attempt+1}), retrying in {delay}s: {e}")
+                    delay = 2**attempt
+                    log.warning(
+                        f"Request failed (attempt {attempt+1}), retrying in {delay}s: {e}"
+                    )
                     await asyncio.sleep(delay)
         return ""
 
@@ -81,7 +88,9 @@ class BaseScraper(ABC):
         delay = random.uniform(*self.request_delay_range)
         await asyncio.sleep(delay)
 
-    async def scrape_city(self, city: str, max_pages: int = 5, fixture_html: str | None = None) -> list[NormalizedListing]:
+    async def scrape_city(
+        self, city: str, max_pages: int = 5, fixture_html: str | None = None
+    ) -> list[NormalizedListing]:
         results: list[NormalizedListing] = []
         for page in range(1, max_pages + 1):
             url = await self.build_search_url(city, page)
@@ -104,7 +113,9 @@ class BaseScraper(ABC):
                         if listing:
                             results.append(listing)
                     except Exception as e:
-                        log.error(f"Failed to parse listing detail {preview.source_url}: {e}")
+                        log.error(
+                            f"Failed to parse listing detail {preview.source_url}: {e}"
+                        )
             except Exception as e:
                 log.error(f"Failed to scrape page {page} of {city}: {e}")
                 break

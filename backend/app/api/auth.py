@@ -1,9 +1,9 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import HTTPBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -68,7 +68,7 @@ async def register(body: RegisterRequest, response: Response, db: AsyncSession =
         email=body.email,
         hashed_password=hash_password(body.password),
         full_name=body.full_name,
-        gdpr_consent_at=datetime.now(timezone.utc),
+        gdpr_consent_at=datetime.now(UTC),
     )
     db.add(user)
     await db.commit()
@@ -125,8 +125,8 @@ async def refresh_token(request: Request) -> TokenResponse:
         user_id: str = payload.get("sub")
         if not user_id or payload.get("type") != "refresh":
             raise HTTPException(status_code=401, detail="Invalid refresh token")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid refresh token")
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail="Invalid refresh token") from e
 
     access_token = create_access_token(user_id)
     return TokenResponse(access_token=access_token)

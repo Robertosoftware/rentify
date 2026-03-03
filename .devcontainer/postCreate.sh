@@ -3,6 +3,14 @@ set -e
 
 echo "==> Rentify devcontainer setup"
 
+# Fix Docker socket permissions so dev user can reach the host Docker daemon.
+# The socket is mounted from the host (Docker-from-Docker pattern). Opening it
+# to all users is safe inside this dev-only container.
+if [ -S /var/run/docker.sock ]; then
+  sudo chmod 666 /var/run/docker.sock
+  echo "==> Docker socket permissions fixed"
+fi
+
 # Copy .env if not present
 if [ ! -f /workspace/.env ]; then
   cp /workspace/.env.example /workspace/.env

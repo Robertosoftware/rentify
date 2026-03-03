@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +17,7 @@ _PROCESSED_EVENTS_PREFIX = "stripe:event:"
 
 async def _get_redis():
     import redis.asyncio as aioredis
+
     return aioredis.from_url(settings.REDIS_URL)
 
 
@@ -36,7 +37,7 @@ async def create_checkout_session(user: User, db: AsyncSession) -> dict:
     if not user.stripe_customer_id:
         customer = stripe.Customer.create(email=user.email, metadata={"user_id": str(user.id)})
         user.stripe_customer_id = customer.id
-        user.updated_at = datetime.now(timezone.utc)
+        user.updated_at = datetime.now(UTC)
         await db.commit()
 
     session = stripe.checkout.Session.create(
@@ -82,7 +83,7 @@ async def handle_webhook_event(body: bytes, signature: str, db: AsyncSession) ->
         except Exception as e:
             from fastapi import HTTPException
 
-            raise HTTPException(status_code=400, detail=f"Invalid webhook signature: {e}")
+            raise HTTPException(status_code=400, detail=f"Invalid webhook signature: {e}") from e
         event_id = event["id"]
         event_type = event["type"]
         data = event
@@ -123,8 +124,8 @@ async def _handle_checkout_completed(data: dict, db: AsyncSession) -> None:
     user = result.scalar_one_or_none()
     if user:
         user.subscription_status = "trialing"
-        user.trial_ends_at = datetime.now(timezone.utc) + timedelta(days=7)
-        user.updated_at = datetime.now(timezone.utc)
+        user.trial_ends_at = datetime.now(UTC) + timedelta(days=7)
+        user.updated_at = datetime.now(UTC)
         await db.commit()
 
 
@@ -136,7 +137,7 @@ async def _handle_invoice_paid(data: dict, db: AsyncSession) -> None:
     user = result.scalar_one_or_none()
     if user:
         user.subscription_status = "active"
-        user.updated_at = datetime.now(timezone.utc)
+        user.updated_at = datetime.now(UTC)
         await db.commit()
 
 
@@ -148,7 +149,7 @@ async def _handle_payment_failed(data: dict, db: AsyncSession) -> None:
     user = result.scalar_one_or_none()
     if user:
         user.subscription_status = "past_due"
-        user.updated_at = datetime.now(timezone.utc)
+        user.updated_at = datetime.now(UTC)
         await db.commit()
 
 
@@ -160,7 +161,7 @@ async def _handle_subscription_deleted(data: dict, db: AsyncSession) -> None:
     user = result.scalar_one_or_none()
     if user:
         user.subscription_status = "canceled"
-        user.updated_at = datetime.now(timezone.utc)
+        user.updated_at = datetime.now(UTC)
         await db.commit()
 
 
@@ -174,7 +175,7 @@ async def _handle_subscription_updated(data: dict, db: AsyncSession) -> None:
     user = result.scalar_one_or_none()
     if user and status in ("trialing", "active", "past_due", "canceled"):
         user.subscription_status = status
-        user.updated_at = datetime.now(timezone.utc)
+        user.updated_at = datetime.now(UTC)
         await db.commit()
 
 

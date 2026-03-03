@@ -31,34 +31,50 @@ class ParariusScraper(BaseScraper):
         cards = soup.find_all(class_=re.compile(r"listing-search-item"))
         for card in cards:
             try:
-                link = card.find("a", class_=re.compile(r"listing-search-item__link|name"))
+                link = card.find(
+                    "a", class_=re.compile(r"listing-search-item__link|name")
+                )
                 if not link:
                     link = card.find("a")
                 if not link:
                     continue
                 href = link.get("href", "")
-                source_url = href if href.startswith("http") else f"{self.base_url}{href}"
+                source_url = (
+                    href if href.startswith("http") else f"{self.base_url}{href}"
+                )
                 source_id = href.rstrip("/").split("/")[-1]
-                title_el = card.find(class_=re.compile(r"listing-search-item__title|name"))
-                title = title_el.get_text(strip=True) if title_el else link.get_text(strip=True)
-                price_el = card.find(class_=re.compile(r"listing-search-item__price|price"))
+                title_el = card.find(
+                    class_=re.compile(r"listing-search-item__title|name")
+                )
+                title = (
+                    title_el.get_text(strip=True)
+                    if title_el
+                    else link.get_text(strip=True)
+                )
+                price_el = card.find(
+                    class_=re.compile(r"listing-search-item__price|price")
+                )
                 price_text = price_el.get_text(strip=True) if price_el else ""
                 price_cents = _parse_pararius_price(price_text)
-                results.append(RawListingPreview(
-                    source_site="pararius",
-                    source_id=source_id,
-                    source_url=source_url,
-                    title=title,
-                    price_eur_cents=price_cents,
-                    city="amsterdam",
-                ))
+                results.append(
+                    RawListingPreview(
+                        source_site="pararius",
+                        source_id=source_id,
+                        source_url=source_url,
+                        title=title,
+                        price_eur_cents=price_cents,
+                        city="amsterdam",
+                    )
+                )
             except Exception:
                 continue
         return results
 
     async def parse_listing_detail(self, html: str) -> Optional[NormalizedListing]:
         soup = BeautifulSoup(html, "lxml")
-        title_el = soup.find("h1") or soup.find(class_=re.compile(r"listing-detail-summary__title"))
+        title_el = soup.find("h1") or soup.find(
+            class_=re.compile(r"listing-detail-summary__title")
+        )
         title = title_el.get_text(strip=True) if title_el else "Pararius listing"
         price_el = soup.find(class_=re.compile(r"listing-detail-summary__price|price"))
         price_text = price_el.get_text(strip=True) if price_el else ""

@@ -21,4 +21,4 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: [types-redis, sqlmodel]
-        args: [--ignore-missing-imports]
+        args: [--ignore-missing-imports, --explicit-package-bases]

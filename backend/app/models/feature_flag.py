@@ -1,12 +1,11 @@
 import uuid
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from sqlmodel import Column, DateTime, Field, SQLModel, String
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class FeatureFlag(SQLModel, table=True):
@@ -15,7 +14,7 @@ class FeatureFlag(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str = Field(sa_column=Column(String(100), unique=True, nullable=False))
     enabled: bool = Field(default=False, nullable=False)
-    description: Optional[str] = Field(default=None, sa_column=Column(String(500), nullable=True))
-    updated_by: Optional[uuid.UUID] = Field(default=None, foreign_key="users.id", nullable=True)
+    description: str | None = Field(default=None, sa_column=Column(String(500), nullable=True))
+    updated_by: uuid.UUID | None = Field(default=None, foreign_key="users.id", nullable=True)
     created_at: datetime = Field(default_factory=utcnow, sa_column=Column(DateTime(timezone=True), nullable=False))
     updated_at: datetime = Field(default_factory=utcnow, sa_column=Column(DateTime(timezone=True), nullable=False))

@@ -7,6 +7,7 @@ FIXTURES = Path(__file__).parent / "fixtures"
 @pytest.mark.asyncio
 async def test_funda_parse_search_results():
     from scrapers.src.scrapers.funda import FundaScraper
+
     html = (FIXTURES / "funda_search_results.html").read_text()
     scraper = FundaScraper()
     results = await scraper.parse_search_results(html)
@@ -18,6 +19,7 @@ async def test_funda_parse_search_results():
 @pytest.mark.asyncio
 async def test_funda_parse_listing_detail():
     from scrapers.src.scrapers.funda import FundaScraper
+
     html = (FIXTURES / "funda_listing_page.html").read_text()
     scraper = FundaScraper()
     listing = await scraper.parse_listing_detail(html)

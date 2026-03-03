@@ -20,7 +20,9 @@ class RequestThrottler:
         # Circuit breaker check
         disabled_until = _circuit_breakers.get(domain, 0)
         if time.time() < disabled_until:
-            raise RuntimeError(f"Circuit breaker open for {domain}, disabled until {disabled_until}")
+            raise RuntimeError(
+                f"Circuit breaker open for {domain}, disabled until {disabled_until}"
+            )
 
         # Adaptive delay
         elapsed = time.time() - _last_request[domain]

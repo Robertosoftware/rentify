@@ -1,6 +1,5 @@
-import structlog
-
 import dramatiq
+import structlog
 from dramatiq.brokers.redis import RedisBroker
 
 from app.config import get_settings

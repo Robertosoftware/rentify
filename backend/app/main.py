@@ -35,7 +35,7 @@ async def startup_event() -> None:
 
 
 # --- Routers ---
-from app.api import auth, billing, preferences, notifications, admin, gdpr, oauth, listings  # noqa: E402
+from app.api import admin, auth, billing, gdpr, listings, notifications, oauth, preferences  # noqa: E402
 from app.middleware.logging_mw import LoggingMiddleware  # noqa: E402
 from app.middleware.rate_limit import RateLimitMiddleware  # noqa: E402
 
@@ -72,7 +72,7 @@ async def health() -> dict:
 
         r = aioredis.from_url(settings.REDIS_URL)
         await r.ping()
-        await r.aclose()
+        await r.close()
     except Exception:
         redis_status = "error"
 

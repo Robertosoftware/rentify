@@ -1,5 +1,7 @@
+from datetime import UTC
+
 import structlog
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,10 +26,10 @@ class NotificationSettings(BaseModel):
 async def connect_telegram(
     body: TelegramConnect, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ) -> dict:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     current_user.telegram_chat_id = body.chat_id
-    current_user.updated_at = datetime.now(timezone.utc)
+    current_user.updated_at = datetime.now(UTC)
     await db.commit()
     log.info("telegram.connected", user_id=str(current_user.id), chat_id=body.chat_id)
     return {"status": "connected"}
@@ -46,10 +48,10 @@ async def get_notification_settings(current_user: User = Depends(get_current_use
 async def update_notification_settings(
     body: NotificationSettings, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ) -> dict:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     if not body.telegram:
         current_user.telegram_chat_id = None
-    current_user.updated_at = datetime.now(timezone.utc)
+    current_user.updated_at = datetime.now(UTC)
     await db.commit()
     return {"telegram": current_user.telegram_chat_id is not None, "email": body.email}

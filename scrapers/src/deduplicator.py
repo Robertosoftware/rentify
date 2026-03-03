@@ -1,4 +1,5 @@
 """Deduplication logic for scraped listings."""
+
 import logging
 from datetime import datetime, timedelta, timezone
 
@@ -33,6 +34,7 @@ async def upsert_listing(listing_data: dict, db_session) -> tuple[bool, bool]:
         return False, True
 
     import uuid
+
     listing = Listing(
         id=uuid.uuid4(),
         source_site=listing_data["source_site"],
@@ -44,19 +46,30 @@ async def upsert_listing(listing_data: dict, db_session) -> tuple[bool, bool]:
         first_seen_at=now,
         last_seen_at=now,
         created_at=now,
-        **{k: v for k, v in listing_data.items() if k not in (
-            "source_site", "source_id", "source_url", "title",
-            "price_eur_cents", "city", "scraped_at",
-        )},
+        **{
+            k: v
+            for k, v in listing_data.items()
+            if k
+            not in (
+                "source_site",
+                "source_id",
+                "source_url",
+                "title",
+                "price_eur_cents",
+                "city",
+                "scraped_at",
+            )
+        },
     )
     db_session.add(listing)
     await db_session.commit()
     return True, False
 
 
-async def mark_delisted(source_site: str, active_ids: set[str], db_session, threshold_days: int = 7) -> int:
+async def mark_delisted(
+    source_site: str, active_ids: set[str], db_session, threshold_days: int = 7
+) -> int:
     """Mark listings as delisted if not seen in threshold_days."""
-    from datetime import timedelta
     from sqlmodel import select
     from backend.app.models.listing import Listing
 
@@ -64,7 +77,7 @@ async def mark_delisted(source_site: str, active_ids: set[str], db_session, thre
     result = await db_session.execute(
         select(Listing).where(
             Listing.source_site == source_site,
-            Listing.delisted_at.is_(None),
+            Listing.delisted_at.is_(None),  # type: ignore[union-attr]
             Listing.last_seen_at < cutoff,
         )
     )

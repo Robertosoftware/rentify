@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException
@@ -10,7 +10,7 @@ from sqlmodel import select
 from app.config import get_settings
 from app.db.session import get_db
 from app.models.user import User
-from app.services.auth_service import create_access_token, create_refresh_token
+from app.services.auth_service import create_access_token
 
 router = APIRouter()
 settings = get_settings()
@@ -85,7 +85,7 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)) -> Redi
             full_name=full_name,
             auth_provider="google",
             google_id=google_id,
-            gdpr_consent_at=datetime.now(timezone.utc),
+            gdpr_consent_at=datetime.now(UTC),
         )
         db.add(user)
         await db.commit()

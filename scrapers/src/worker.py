@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """Main scraper worker loop."""
+
 import argparse
 import asyncio
 import json
 import logging
 import os
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 from scrapers.src.scrapers import SCRAPER_REGISTRY
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s"
+)
 log = logging.getLogger(__name__)
 
 OUTPUT_DIR = Path(__file__).parent.parent / "output"
@@ -51,8 +53,10 @@ async def run_scraper_fixture(scraper_name: str, city: str) -> list[dict]:
     return listings
 
 
-async def main(sources: list[str], cities: list[str], live: bool = False) -> None:
-    log.info(f"Scraper worker starting | sources={sources} | cities={cities} | live={live}")
+async def main(sources: list[str], cities: list[str], live: bool = False) -> dict:
+    log.info(
+        f"Scraper worker starting | sources={sources} | cities={cities} | live={live}"
+    )
     all_results = {}
 
     for source in sources:
@@ -63,7 +67,7 @@ async def main(sources: list[str], cities: list[str], live: bool = False) -> Non
             if live:
                 scraper = SCRAPER_REGISTRY[source]()
                 listings = await scraper.scrape_city(city, max_pages=1)
-                listing_dicts = [l.model_dump() for l in listings]
+                listing_dicts = [listing.model_dump() for listing in listings]
             else:
                 listing_dicts = await run_scraper_fixture(source, city)
 
@@ -73,20 +77,31 @@ async def main(sources: list[str], cities: list[str], live: bool = False) -> Non
 
     # Write output
     OUTPUT_DIR.mkdir(exist_ok=True)
-    out_file = OUTPUT_DIR / f"scrape_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.json"
+    out_file = (
+        OUTPUT_DIR
+        / f"scrape_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.json"
+    )
     out_file.write_text(json.dumps(all_results, indent=2, default=str))
     log.info(f"Output written to {out_file}")
 
     total = sum(len(v) for v in all_results.values())
-    log.info(f"Scrape complete: {total} total listings across {len(all_results)} source/city pairs")
+    log.info(
+        f"Scrape complete: {total} total listings across {len(all_results)} source/city pairs"
+    )
     return all_results
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Rentify scraper worker")
-    parser.add_argument("--sources", default=os.getenv("SCRAPER_SOURCES", "funda,pararius"))
+    parser.add_argument(
+        "--sources", default=os.getenv("SCRAPER_SOURCES", "funda,pararius")
+    )
     parser.add_argument("--cities", default=os.getenv("SCRAPER_CITIES", "amsterdam"))
-    parser.add_argument("--live", action="store_true", default=os.getenv("ENABLE_LIVE_SCRAPING", "false") == "true")
+    parser.add_argument(
+        "--live",
+        action="store_true",
+        default=os.getenv("ENABLE_LIVE_SCRAPING", "false") == "true",
+    )
     args = parser.parse_args()
 
     sources = [s.strip() for s in args.sources.split(",") if s.strip()]

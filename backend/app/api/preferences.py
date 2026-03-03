@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -69,7 +69,7 @@ async def create_preference(
     if len(existing) >= limit:
         raise HTTPException(status_code=403, detail=f"Preference limit reached ({limit} max)")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     pref = Preference(
         id=uuid.uuid4(),
         user_id=current_user.id,
@@ -98,7 +98,7 @@ async def update_preference(
 
     for field, value in body.model_dump(exclude_none=True).items():
         setattr(pref, field, value)
-    pref.updated_at = datetime.now(timezone.utc)
+    pref.updated_at = datetime.now(UTC)
     await db.commit()
     await db.refresh(pref)
     return _pref_to_dict(pref)
@@ -113,7 +113,7 @@ async def delete_preference(
     if not pref:
         raise HTTPException(status_code=404, detail="Preference not found")
     pref.is_active = False
-    pref.updated_at = datetime.now(timezone.utc)
+    pref.updated_at = datetime.now(UTC)
     await db.commit()
 
 

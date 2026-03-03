@@ -47,7 +47,9 @@ class Settings:
     ENABLE_SCRAPING: bool = os.getenv("ENABLE_SCRAPING", "false").lower() == "true"
 
     # Scraper settings
-    SCRAPER_SOURCES: str = os.getenv("SCRAPER_SOURCES", "funda,pararius,kamernet,huurwoningen,housinganywhere,directbijeigenaar")
+    SCRAPER_SOURCES: str = os.getenv(
+        "SCRAPER_SOURCES", "funda,pararius,kamernet,huurwoningen,housinganywhere,directbijeigenaar"
+    )
     SCRAPER_CITIES: str = os.getenv("SCRAPER_CITIES", "amsterdam,rotterdam,utrecht,den-haag,eindhoven,groningen")
     SCRAPER_INTERVAL_SECONDS: int = int(os.getenv("SCRAPER_INTERVAL_SECONDS", "3600"))
     SCRAPER_MAX_PAGES_PER_CITY: int = int(os.getenv("SCRAPER_MAX_PAGES_PER_CITY", "5"))

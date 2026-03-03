@@ -42,7 +42,7 @@ async def list_listings(
     pages = (total + per_page - 1) // per_page if total > 0 else 1
 
     return {
-        "items": [_listing_to_dict(l) for l in listings],
+        "items": [_listing_to_dict(listing) for listing in listings],
         "total": total,
         "page": page,
         "per_page": per_page,
@@ -102,29 +102,29 @@ async def list_matches(
     }
 
 
-def _listing_to_dict(l: Listing) -> dict:
+def _listing_to_dict(listing: Listing) -> dict:
     return {
-        "id": str(l.id),
-        "source_site": l.source_site,
-        "source_url": l.source_url,
-        "title": l.title,
-        "description": l.description,
-        "price_eur_cents": l.price_eur,
-        "price_eur": l.price_eur / 100,
-        "price_type": l.price_type,
-        "rooms": l.rooms,
-        "bedrooms": l.bedrooms,
-        "size_sqm": l.size_sqm,
-        "city": l.city,
-        "neighborhood": l.neighborhood,
-        "postal_code": l.postal_code,
-        "country_code": l.country_code,
-        "address": l.address,
-        "pet_friendly": l.pet_friendly,
-        "furnished": l.furnished,
-        "energy_label": l.energy_label,
-        "available_from": l.available_from.isoformat() if l.available_from else None,
-        "rental_agent": l.rental_agent,
-        "image_urls": l.image_urls or [],
-        "first_seen_at": l.first_seen_at.isoformat(),
+        "id": str(listing.id),
+        "source_site": listing.source_site,
+        "source_url": listing.source_url,
+        "title": listing.title,
+        "description": listing.description,
+        "price_eur_cents": listing.price_eur,
+        "price_eur": listing.price_eur / 100,
+        "price_type": listing.price_type,
+        "rooms": listing.rooms,
+        "bedrooms": listing.bedrooms,
+        "size_sqm": listing.size_sqm,
+        "city": listing.city,
+        "neighborhood": listing.neighborhood,
+        "postal_code": listing.postal_code,
+        "country_code": listing.country_code,
+        "address": listing.address,
+        "pet_friendly": listing.pet_friendly,
+        "furnished": listing.furnished,
+        "energy_label": listing.energy_label,
+        "available_from": listing.available_from.isoformat() if listing.available_from else None,
+        "rental_agent": listing.rental_agent,
+        "image_urls": listing.image_urls or [],
+        "first_seen_at": listing.first_seen_at.isoformat(),
     }

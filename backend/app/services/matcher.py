@@ -12,9 +12,8 @@ def score_listing(listing: Listing, pref: Preference) -> float:
         return 0.0
     score += WEIGHTS["city"]
 
-    if pref.min_price is None or listing.price_eur >= pref.min_price:
-        if listing.price_eur <= pref.max_price:
-            score += WEIGHTS["price"]
+    if (pref.min_price is None or listing.price_eur >= pref.min_price) and listing.price_eur <= pref.max_price:
+        score += WEIGHTS["price"]
 
     if pref.min_rooms and pref.max_rooms:
         if listing.rooms and pref.min_rooms <= listing.rooms <= pref.max_rooms:

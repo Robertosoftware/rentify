@@ -1,6 +1,5 @@
 import uuid
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock
+from datetime import UTC, datetime
 
 import pytest
 import pytest_asyncio
@@ -9,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlmodel import SQLModel
 
 from app.config import get_settings
-from app.main import app
 from app.db.session import get_db
+from app.main import app
 from app.models import User
 from app.services.auth_service import create_access_token, hash_password
 
@@ -71,9 +70,9 @@ async def test_user(db_session, test_user_data):
         email=test_user_data["email"],
         hashed_password=hash_password(test_user_data["password"]),
         full_name=test_user_data["full_name"],
-        gdpr_consent_at=datetime.now(timezone.utc),
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc),
+        gdpr_consent_at=datetime.now(UTC),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
     db_session.add(user)
     await db_session.commit()
@@ -89,9 +88,9 @@ async def admin_user(db_session):
         hashed_password=hash_password("adminpassword123"),
         full_name="Admin User",
         is_admin=True,
-        gdpr_consent_at=datetime.now(timezone.utc),
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc),
+        gdpr_consent_at=datetime.now(UTC),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
     db_session.add(user)
     await db_session.commit()

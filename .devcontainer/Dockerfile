@@ -9,6 +9,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Docker CLI from official static release (avoids apt repo complexity)
+RUN ARCH=$(uname -m) \
+    && curl -fsSL "https://download.docker.com/linux/static/stable/${ARCH}/docker-27.5.1.tgz" \
+       | tar -xz --strip-components=1 -C /usr/local/bin docker/docker
+
 # Install uv via official installer
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 

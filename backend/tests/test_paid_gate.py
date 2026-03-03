@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -9,6 +9,7 @@ from app.models.listing import Listing
 
 async def _seed_flag(db_session, name, enabled):
     from sqlmodel import select
+
     result = await db_session.execute(select(FeatureFlag).where(FeatureFlag.name == name))
     flag = result.scalar_one_or_none()
     if flag:
@@ -18,8 +19,8 @@ async def _seed_flag(db_session, name, enabled):
             id=uuid.uuid4(),
             name=name,
             enabled=enabled,
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
         db_session.add(flag)
     await db_session.commit()
@@ -34,9 +35,9 @@ async def _seed_listing(db_session):
         title="Test Apartment",
         price_eur=150000,
         city="amsterdam",
-        first_seen_at=datetime.now(timezone.utc),
-        last_seen_at=datetime.now(timezone.utc),
-        created_at=datetime.now(timezone.utc),
+        first_seen_at=datetime.now(UTC),
+        last_seen_at=datetime.now(UTC),
+        created_at=datetime.now(UTC),
     )
     db_session.add(listing)
     await db_session.commit()

@@ -1,9 +1,8 @@
 import uuid
-from datetime import datetime, timezone
-
-import structlog
+from datetime import UTC, datetime
 
 import dramatiq
+import structlog
 
 log = structlog.get_logger()
 
@@ -16,7 +15,6 @@ def match_listing(listing_id: str) -> None:
 
 
 async def _match_listing_async(listing_id: str) -> None:
-    from sqlalchemy.ext.asyncio import AsyncSession
     from sqlmodel import select
 
     from app.db.session import AsyncSessionLocal
@@ -54,7 +52,7 @@ async def _match_listing_async(listing_id: str) -> None:
                     listing_id=listing.id,
                     preference_id=pref.id,
                     score=sc,
-                    created_at=datetime.now(timezone.utc),
+                    created_at=datetime.now(UTC),
                 )
                 db.add(match)
                 await db.commit()
@@ -70,8 +68,6 @@ def notify_user(match_id: str) -> None:
 
 
 async def _notify_user_async(match_id: str) -> None:
-    from sqlmodel import select
-
     from app.db.session import AsyncSessionLocal
     from app.models.listing import Listing
     from app.models.match import Match
@@ -100,12 +96,16 @@ async def _notify_user_async(match_id: str) -> None:
             await send_telegram_message(user.telegram_chat_id, msg)
             match.notification_channel = "telegram"
         else:
-            html = f"<h2>New Rental Match</h2><p>{listing.title}</p><p>Price: €{listing.price_eur // 100}/month</p><a href='{listing.source_url}'>View listing</a>"
+            html = (
+                f"<h2>New Rental Match</h2><p>{listing.title}</p>"
+                f"<p>Price: €{listing.price_eur // 100}/month</p>"
+                f"<a href='{listing.source_url}'>View listing</a>"
+            )
             await send_email(user.email, "New Rental Match!", html)
             match.notification_channel = "email"
 
         match.notified = True
-        match.notified_at = datetime.now(timezone.utc)
+        match.notified_at = datetime.now(UTC)
         await db.commit()
 
 
@@ -130,6 +130,10 @@ async def _send_trial_reminder_async(user_id: str, reminder_type: str) -> None:
             "48h": "Your Rentify trial ends in 48 hours",
             "24h": "Last day of your Rentify trial!",
         }
-        html = f"<p>Hi {user.full_name or 'there'},</p><p>Your 7-day trial {subjects.get(reminder_type, 'is ending soon')}. <a href='http://localhost:5173/dashboard'>Upgrade now</a> to keep getting matches.</p>"
+        html = (
+            f"<p>Hi {user.full_name or 'there'},</p>"
+            f"<p>Your 7-day trial {subjects.get(reminder_type, 'is ending soon')}. "
+            "<a href='http://localhost:5173/dashboard'>Upgrade now</a> to keep getting matches.</p>"
+        )
         await send_email(user.email, subjects.get(reminder_type, "Trial ending"), html)
         log.info("trial_reminder.sent", user_id=user_id, type=reminder_type)

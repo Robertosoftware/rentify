@@ -15,11 +15,13 @@ async def test_create_checkout_session_mock(async_client, test_user, auth_header
 
 @pytest.mark.anyio
 async def test_webhook_valid_signature(async_client):
-    payload = json.dumps({
-        "id": f"evt_{uuid.uuid4().hex}",
-        "type": "checkout.session.completed",
-        "data": {"object": {"customer": "cus_test"}},
-    })
+    payload = json.dumps(
+        {
+            "id": f"evt_{uuid.uuid4().hex}",
+            "type": "checkout.session.completed",
+            "data": {"object": {"customer": "cus_test"}},
+        }
+    )
     response = await async_client.post(
         "/stripe/webhook",
         content=payload,
@@ -31,11 +33,13 @@ async def test_webhook_valid_signature(async_client):
 @pytest.mark.anyio
 async def test_webhook_idempotency(async_client):
     event_id = f"evt_{uuid.uuid4().hex}"
-    payload = json.dumps({
-        "id": event_id,
-        "type": "checkout.session.completed",
-        "data": {"object": {"customer": "cus_idempotent"}},
-    })
+    payload = json.dumps(
+        {
+            "id": event_id,
+            "type": "checkout.session.completed",
+            "data": {"object": {"customer": "cus_idempotent"}},
+        }
+    )
     r1 = await async_client.post("/stripe/webhook", content=payload, headers={"content-type": "application/json"})
     r2 = await async_client.post("/stripe/webhook", content=payload, headers={"content-type": "application/json"})
     assert r1.status_code == 200

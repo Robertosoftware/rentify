@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -12,8 +12,8 @@ async def _seed_flag(db_session, name="paid_gate_enabled", enabled=False):
         name=name,
         enabled=enabled,
         description="Test flag",
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
     db_session.add(flag)
     await db_session.commit()
